@@ -1,0 +1,96 @@
+version: v1.0
+name: Semaphore PHP Example Pipeline
+agent:
+  machine:
+    type: e1-standard-2
+    os_image: ubuntu1804
+
+blocks:
+  - name: "Install Dependencies"
+    task:
+      env_vars:
+        - name: APP_ENV
+          value: prod
+      jobs:
+        - name: composer
+          commands:
+            - checkout
+            - cache restore composer-$SEMAPHORE_GIT_BRANCH-$(checksum composer.lock)
+            - composer install
+            - cache store composer-$SEMAPHORE_GIT_BRANCH-$(checksum composer.lock) vendor
+            - echo "Composer Dependencies Installed!!!"
+            - cp .env.example .env
+            - php artisan key:generate
+        - name: npm
+          commands:
+            - checkout
+            - cache restore node-modules-$SEMAPHORE_GIT_BRANCH-$(checksum package-lock.json),node-modules-$SEMAPHORE_GIT_BRANCH,node-modules-master
+            - npm install
+            - npm install --global cross-env
+            - cache store node-modules-$SEMAPHORE_GIT_BRANCH-$(checksum package-lock.json),node-modules-$SEMAPHORE_GIT_BRANCH,node-modules-master node_modules
+
+  - name: "Build Assets"
+    task:
+      jobs:
+        - name: build-assets
+          commands:
+            - checkout
+            - cache restore node-modules-$SEMAPHORE_GIT_BRANCH-$(checksum package-lock.json),node-modules-$SEMAPHORE_GIT_BRANCH,node-modules-master
+            - npm run prod
+
+
+  - name: "Run Code Analysis"
+    task:
+      env_vars:
+        - name: APP_ENV
+          value: test
+      prologue:
+        commands:
+          - checkout
+          - cache restore composer-$SEMAPHORE_GIT_BRANCH-$(checksum composer.lock)
+      jobs:
+        - name: phpmd
+          commands:
+            - php vendor/bin/phpmd app/ text phpmd_ruleset.xml
+        - name: phpcs
+          commands:
+            - php vendor/bin/phpcs app --report-full --standard=PSR2
+        - name: phpcpd
+          commands:
+            - curl -L https://phar.phpunit.de/phpcpd.phar -o phpcpd.phar
+            - php phpcpd.phar app/ --min-lines=50
+
+  - name: "Run Unit tests"
+    task:
+      jobs:
+      - name: phpunit
+        commands:
+          - checkout
+          - cache restore composer-$SEMAPHORE_GIT_BRANCH-$(checksum composer.lock)
+          - ./vendor/bin/phpunit
+
+  - name: "Run Browser tests"
+    task:
+      env_vars:
+      - name: APP_ENV
+        value: local
+      jobs:
+        - name: laravel dusk
+          commands:
+            - checkout
+            - cp .env.example .env
+            - cache restore composer-$SEMAPHORE_GIT_BRANCH-$(checksum composer.lock)
+            - php artisan key:generate
+            - php artisan serve --env=dusk.local &
+            - php artisan dusk
+
+  - name: "Run Security Tests"
+    task:
+      jobs:
+        - name: sensiolabs
+          commands:
+            - checkout
+            - git clone https://github.com/sensiolabs/security-checker.git
+            - cd security-checker
+            - composer install
+            - php security-checker security:check ../composer.lock
