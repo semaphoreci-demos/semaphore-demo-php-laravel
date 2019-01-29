@@ -78,6 +78,7 @@ blocks:
           commands:
             - checkout
             - cp .env.example .env
+            - touch database/database.sqlite
             - cache restore composer-$SEMAPHORE_GIT_BRANCH-$(checksum composer.lock)
             - php artisan key:generate
             - php artisan serve --env=dusk.local &
