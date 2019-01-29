@@ -38,7 +38,6 @@ blocks:
             - cache restore node-modules-$SEMAPHORE_GIT_BRANCH-$(checksum package-lock.json),node-modules-$SEMAPHORE_GIT_BRANCH,node-modules-master
             - npm run prod
 
-
   - name: "Run Code Analysis"
     task:
       env_vars:
