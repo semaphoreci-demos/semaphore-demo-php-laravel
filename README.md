@@ -4,14 +4,14 @@ Simple Laravel web application with Semaphore pipeline example.
 
 ## Prerequisites
 
-To setup the project locally, your local environment needs to be se setup. For a full list of requirements, 
-cheeck out [Laravel Documentation](https://laravel.com/docs/5.7#server-requirements).
+To setup the project locally, your local environment needs to be setup. For a full list of requirements, 
+check out [Laravel Documentation](https://laravel.com/docs/5.7#server-requirements).
 We recommend setting up using Vagrant and Homestead, as it is a turn key solution supported on all major operating systems. 
 A Dockerized setup is also a viable option. 
 
 ## Project Setup
 
-Once the local environemnt is setup to be able to run Laravel applications, pull in the local repository and run the following
+Once the local environment is setup to be able to run Laravel applications, pull in the local repository and run the following
 set of commands.
 
 ```
@@ -22,7 +22,7 @@ php artisan key:generate
 php artisan migrate
 
 ```
-That will set up the application on your local environemnt. 
+That will set up the application on your local environment. 
 
 ## Semaphore Pipeline
 
