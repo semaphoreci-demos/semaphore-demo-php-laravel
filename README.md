@@ -42,8 +42,6 @@ The pipeline is defined inside `.semaphore/semaphore.yml` file.
 The example pipeline contains 6 blocks:
  - Install Dependencies 
     -  installs and caches all composer and npm dependencies
- - Build Assets 
-    - Builds and compiles JS assets by using Laravel Mix defined in package.json
  - Run Code Analysis 
     - Runs PHP Mess Detector which as an example is installed as a composer dependency
     - Runs PHP Code Sniffer which as an example is installed as a composer dependency
