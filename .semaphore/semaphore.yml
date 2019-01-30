@@ -15,47 +15,44 @@ blocks:
         - name: composer
           commands:
             - checkout
-            - cache restore composer-$SEMAPHORE_GIT_BRANCH-$(checksum composer.lock)
+            # Try and find a cached version of our /vendor dependencies folder.
+            # Semaphore tries to find a partial match.
+            - cache restore composer-$SEMAPHORE_GIT_BRANCH-$(checksum composer.lock),composer-$SEMAPHORE_GIT_BRANCH,composer-master
+            # Install our project composer dependencies
             - composer install
+            # Store the /vendor folder into cache for later use.
             - cache store composer-$SEMAPHORE_GIT_BRANCH-$(checksum composer.lock) vendor
-            - echo "Composer Dependencies Installed!!!"
+            # We are setting up the .env file from our example file which contains Semaphore DB data and proper app URL
             - cp .env.example .env
+            # We need to generate an application key for Laravel to work.
             - php artisan key:generate
         - name: npm
           commands:
             - checkout
+            # Try and find a cached version of our /node_modules dependencies folder.
             - cache restore node-modules-$SEMAPHORE_GIT_BRANCH-$(checksum package-lock.json),node-modules-$SEMAPHORE_GIT_BRANCH,node-modules-master
             - npm install
-            - npm install --global cross-env
+            # Store the /node_modules folder into cache for later use.
             - cache store node-modules-$SEMAPHORE_GIT_BRANCH-$(checksum package-lock.json),node-modules-$SEMAPHORE_GIT_BRANCH,node-modules-master node_modules
-
-  - name: "Build Assets"
-    task:
-      jobs:
-        - name: build-assets
-          commands:
-            - checkout
-            - cache restore node-modules-$SEMAPHORE_GIT_BRANCH-$(checksum package-lock.json),node-modules-$SEMAPHORE_GIT_BRANCH,node-modules-master
-            - npm run prod
 
   - name: "Run Code Analysis"
     task:
-      env_vars:
-        - name: APP_ENV
-          value: test
       prologue:
         commands:
           - checkout
-          - cache restore composer-$SEMAPHORE_GIT_BRANCH-$(checksum composer.lock)
+          - cache restore composer-$SEMAPHORE_GIT_BRANCH-$(checksum composer.lock),composer-$SEMAPHORE_GIT_BRANCH,composer-master
       jobs:
         - name: phpmd
           commands:
+            # Run the PHP Mess Detector from our project dependency binary
             - php vendor/bin/phpmd app/ text phpmd_ruleset.xml
         - name: phpcs
           commands:
+            # Run the PHP Code Sniffer from our project dependency binary
             - php vendor/bin/phpcs app --report-full --standard=PSR2
         - name: phpcpd
           commands:
+            # Run the PHP Copy Paste Detector from online repository.
             - curl -L https://phar.phpunit.de/phpcpd.phar -o phpcpd.phar
             - php phpcpd.phar app/ --min-lines=50
 
@@ -65,23 +62,26 @@ blocks:
       - name: phpunit
         commands:
           - checkout
-          - cache restore composer-$SEMAPHORE_GIT_BRANCH-$(checksum composer.lock)
+          - cache restore composer-$SEMAPHORE_GIT_BRANCH-$(checksum composer.lock),composer-$SEMAPHORE_GIT_BRANCH,composer-master
+          # Run the unit tests from the phpunit binary in vendor folder
           - ./vendor/bin/phpunit
 
   - name: "Run Browser tests"
     task:
-      env_vars:
-      - name: APP_ENV
-        value: local
       jobs:
         - name: laravel dusk
           commands:
             - checkout
             - cp .env.example .env
+            # Create an empty .sqlite DB
             - touch database/database.sqlite
-            - cache restore composer-$SEMAPHORE_GIT_BRANCH-$(checksum composer.lock)
+            - cache restore composer-$SEMAPHORE_GIT_BRANCH-$(checksum composer.lock),composer-$SEMAPHORE_GIT_BRANCH,composer-master
+            # Create an application key again.
             - php artisan key:generate
+            # Start Laravel's built-in web server so the web driver used by Dusk can connect.
+            # We start the server using the .env.dusk.local environment file that uses SQLITE.
             - php artisan serve --env=dusk.local &
+            # Run the tests
             - php artisan dusk
 
   - name: "Run Security Tests"
@@ -90,7 +90,10 @@ blocks:
         - name: sensiolabs
           commands:
             - checkout
+            # We clone the Security Checker repository, and cd into it.
             - git clone https://github.com/sensiolabs/security-checker.git
             - cd security-checker
+            # Install Secuirity Checker dependencies (not to be confused by our project dependencies)
             - composer install
+            # Finally, run the check
             - php security-checker security:check ../composer.lock
