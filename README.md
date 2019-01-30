@@ -37,7 +37,7 @@ sem init
 After that, each push to the repository will trigger a pipeline to be ran on Semaphore.
 
 ## Example Pipeline
-![pipeline](https://i.imgur.com/qmqpWTO.png)
+![pipeline](https://i.imgur.com/mg1bcsQ.png)
 The pipeline is defined inside `.semaphore/semaphore.yml` file.
 The example pipeline contains 6 blocks:
  - Install Dependencies 
