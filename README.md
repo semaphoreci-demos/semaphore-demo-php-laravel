@@ -1,45 +1,45 @@
-# semaphore-php-example
+# Semaphore demo CI/CD pipeline using PHP Laravel
 
-Simple Laravel web application with Semaphore pipeline example.
+Example application and CI/CD pipeline showing how to run a PHP Laravel project
+on Semaphore 2.0.
 
-## Prerequisites
+## Local project setup
 
-To setup the project locally, your local environment needs to be setup. For a full list of requirements, 
-check out [Laravel Documentation](https://laravel.com/docs/5.7#server-requirements).
-We recommend setting up using Vagrant and Homestead, as it is a turn key solution supported on all major operating systems. 
-A Dockerized setup is also a viable option. 
+To setup the project locally, your local environment needs to meet common
+Laravel development requirements, as per [Laravel
+Documentation](https://laravel.com/docs/5.7#server-requirements).
+We recommend setting up using Vagrant and Homestead, as it is a turn key
+solution supported on all major operating systems.
 
-## Project Setup
-
-Once the local environment is setup to be able to run Laravel applications, pull in the local repository and run the following
-set of commands.
+Once the local environment is set up, you can run the following commands:
 
 ```
-git clone git@github.com:savamarkovic/semaphore-php-example.git
 cp .env.example .env // and enter your DB details in the newly created .env
 composer install
 php artisan key:generate
 php artisan migrate
+```
+
+## CI/CD on Semaphore
+
+Fork this repository and use it to [create a
+project](https://docs.semaphoreci.com/article/63-your-first-project):
 
 ```
-That will set up the application on your local environment. 
-
-## Semaphore Pipeline
-
-Once you push your fork of the repository to Github, you can add it to Semaphore as well. Make sure you have connected Semaphore
-to your Github account.
-```
-curl https://storage.googleapis.com/sem-cli-releases/get.sh | bash // install Semaphore CLI to local env
+curl https://storage.googleapis.com/sem-cli-releases/get.sh | bash
 sem connect <semaphore-organization-link> <semaphore-id> // found in Semaphore Dashboard
 cd <project directory>
 sem init
 ```
-After that, each push to the repository will trigger a pipeline to be ran on Semaphore.
 
-## Example Pipeline
-![pipeline](https://i.imgur.com/mg1bcsQ.png)
-The pipeline is defined inside `.semaphore/semaphore.yml` file.
+After that, push to the repository to trigger a workflow on Semaphore.
+
+The CI pipeline will look like this:
+
+![CI pipeline on Semaphore](public/ci-pipeline.png)
+
 The example pipeline contains 6 blocks:
+
  - Install Dependencies 
     -  installs and caches all composer and npm dependencies
  - Run Code Analysis 
@@ -52,3 +52,9 @@ The example pipeline contains 6 blocks:
     - Runs browser tests through Laravel Dusk. 
  - Run Security Tests
     - Runs Sensiolabs security checker pulled in via cURL
+
+## License
+
+Copyright (c) 2019 Rendered Text
+
+Distributed under the MIT License. See the file LICENSE.md.
