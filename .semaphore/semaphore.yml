@@ -1,10 +1,25 @@
+# Use the latest stable version of Semaphore 2.0 YML syntax:
 version: v1.0
+
+# Name your pipeline. In case you connect multiple pipelines with promotions,
+# the name will help you differentiate between, for example, a CI build phase
+# and delivery phases.
 name: Semaphore PHP Example Pipeline
+
+# An agent defines the environment in which your code runs.
+# It is a combination of one of available machine types and operating
+# system images.
+# See https://docs.semaphoreci.com/article/20-machine-types
+# and https://docs.semaphoreci.com/article/32-ubuntu-1804-image
 agent:
   machine:
     type: e1-standard-2
     os_image: ubuntu1804
-# Let's define our blocks.
+
+# Blocks are the heart of a pipeline and are executed sequentially.
+# Each block has a task that defines one or more jobs. Jobs define the
+# commands to execute.
+# See https://docs.semaphoreci.com/article/62-concepts
 blocks:
   - name: "Install Dependencies"
     task:
@@ -14,9 +29,15 @@ blocks:
       jobs:
         - name: composer
           commands:
+            # Checkout code from Git repository. This step is mandatory if the
+            # job is to work with your code.
+            # Optionally you may use --use-cache flag to avoid roundtrip to
+            # remote repository.
+            # See https://docs.semaphoreci.com/article/54-toolbox-reference#libcheckout
             - checkout
             # Try and find a cached version of our /vendor dependencies folder.
             # Semaphore tries to find a partial match.
+            # Read about caching: https://docs.semaphoreci.com/article/54-toolbox-reference#cache
             - cache restore composer-$SEMAPHORE_GIT_BRANCH-$(checksum composer.lock),composer-$SEMAPHORE_GIT_BRANCH,composer-master
             # Install our project composer dependencies
             - composer install
