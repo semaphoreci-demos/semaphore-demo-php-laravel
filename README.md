@@ -23,7 +23,8 @@ php artisan migrate
 ## CI/CD on Semaphore
 
 Fork this repository and use it to [create a
-project](https://docs.semaphoreci.com/article/63-your-first-project):
+project](https://docs.semaphoreci.com/article/63-your-first-project),
+from web UI or command line:
 
 ```
 curl https://storage.googleapis.com/sem-cli-releases/get.sh | bash
