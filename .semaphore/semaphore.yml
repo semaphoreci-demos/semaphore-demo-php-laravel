@@ -99,6 +99,7 @@ blocks:
             - cache restore composer-$SEMAPHORE_GIT_BRANCH-$(checksum composer.lock),composer-$SEMAPHORE_GIT_BRANCH,composer-master
             # Create an application key again.
             - php artisan key:generate
+            - php artisan dusk:update --detect
             # Start Laravel's built-in web server so the web driver used by Dusk can connect.
             # We start the server using the .env.dusk.local environment file that uses SQLITE.
             - php artisan serve --env=dusk.local &
