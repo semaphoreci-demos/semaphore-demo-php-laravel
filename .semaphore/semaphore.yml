@@ -42,6 +42,7 @@ blocks:
             # Install our project composer
             - composer install
             # Install node dependencies
+            - npm install
             # Store the /vendor and node_modules folders into cache for later use.
             - cache store
             # We are setting up the .env file from our example file which contains Semaphore DB data and proper app URL
