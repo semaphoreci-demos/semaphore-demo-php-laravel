@@ -15,7 +15,11 @@ agent:
   machine:
     type: e1-standard-2
     os_image: ubuntu1804
-
+    
+global_job_config:
+  prologue:
+    commands:
+      - sem-version php 7.3
 # Blocks are the heart of a pipeline and are executed sequentially.
 # Each block has a task that defines one or more jobs. Jobs define the
 # commands to execute.
