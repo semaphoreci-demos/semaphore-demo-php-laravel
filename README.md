@@ -1,4 +1,4 @@
-![CI status badge](https://semaphore-demos.semaphoreci.com/badges/semaphore-demo-php-laravel/branches/fork-and-run.svg)
+![CI status badge](https://semaphore-demos.semaphoreci.com/badges/semaphore-demo-php-laravel/branches/master.svg)
 
 # Semaphore demo CI/CD pipeline using PHP Laravel
 
