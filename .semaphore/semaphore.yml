@@ -60,6 +60,8 @@ blocks:
         commands:
           - checkout
           - cache restore
+          - composer install
+          - npm install
       jobs:
         - name: phpmd
           commands:
@@ -82,6 +84,8 @@ blocks:
         commands:
           - checkout
           - cache restore
+          - composer install
+          - npm install
           # Run the unit tests from the phpunit binary in vendor folder
           - ./vendor/bin/phpunit
 
@@ -95,6 +99,8 @@ blocks:
             # Create an empty .sqlite DB
             - touch database/database.sqlite
             - cache restore
+            - composer install
+            - npm install
             # Create an application key again.
             - php artisan key:generate
             - php artisan dusk:update --detect
