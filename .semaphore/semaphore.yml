@@ -113,13 +113,10 @@ blocks:
   - name: "Run Security Tests"
     task:
       jobs:
-        - name: sensiolabs
+        - name: security-checker
           commands:
             - checkout
-            # We clone the Security Checker repository, and cd into it.
-            - git clone https://github.com/sensiolabs/security-checker.git
-            - cd security-checker
-            # Install Secuirity Checker dependencies (not to be confused by our project dependencies)
-            - composer install
-            # Finally, run the check
-            - php security-checker security:check ../composer.lock
+            # We pull latest symfony cli docker image
+            - docker pull symfonycorp/cli:latest
+            # And finally, run the check
+            - docker run --rm -v $(pwd):$(pwd) -w $(pwd) symfonycorp/cli check:security
