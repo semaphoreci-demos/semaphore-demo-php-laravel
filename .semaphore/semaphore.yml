@@ -80,14 +80,18 @@ blocks:
   - name: "Run Unit tests"
     task:
       jobs:
-      - name: phpunit
-        commands:
-          - checkout
-          - cache restore
-          - composer install
-          - npm install
-          # Run the unit tests from the phpunit binary in vendor folder
-          - ./vendor/bin/phpunit
+        - name: phpunit
+          commands:
+            - checkout
+            - cache restore
+            - composer install
+            - npm install
+            # Run the unit tests from the phpunit binary in vendor folder
+            - ./vendor/bin/phpunit --log-junit junit.xml
+      epilogue:
+        always:
+          commands:
+            - test-results publish junit.xml
 
   - name: "Run Browser tests"
     task:
