@@ -80,14 +80,14 @@ blocks:
   - name: "Run Unit tests"
     task:
       jobs:
-      - name: phpunit
-        commands:
-          - checkout
-          - cache restore
-          - composer install
-          - npm install
-          # Run the unit tests from the phpunit binary in vendor folder
-          - ./vendor/bin/phpunit
+        - name: phpunit
+          commands:
+            - checkout
+            - cache restore
+            - composer install
+            - npm install
+            # Run the unit tests from the phpunit binary in vendor folder
+            - ./vendor/bin/phpunit
 
   - name: "Run Browser tests"
     task:
@@ -117,6 +117,6 @@ blocks:
           commands:
             - checkout
             # We pull latest symfony cli docker image
-            - docker pull symfonycorp/cli:latest
+            - docker pull solune/symfony:7.4-cli
             # And finally, run the check
-            - docker run --rm -v $(pwd):$(pwd) -w $(pwd) symfonycorp/cli check:security
+            - docker run --rm -v $(pwd):$(pwd) -w $(pwd) solune/symfony:7.4-cli symfony check:security
